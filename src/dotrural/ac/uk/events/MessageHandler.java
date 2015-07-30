@@ -173,7 +173,7 @@ public class MessageHandler {
 							+ "\",\"duration\":\""
 							+ diffMinutes
 							+ "mins\",\"serviceTime\":\""
-							+ closesToTheJourneyStart + "\" }";
+							+ closesToTheJourneyStart + "\",\"recipient\":\""+ongoingJourney.getTraveller()+"\" }";
 					HashMap parameters = new HashMap();
 					parameters.put("type", "RealTime");
 					parameters.put("service", ongoingJourney.getBusRoutes()
@@ -312,7 +312,7 @@ public class MessageHandler {
 				String data = "{\"type\":\"RealTime\",\"service\":\"service "
 						+ ongoingJourney.getBusRoutes().get(i)
 						+ "\",\"duration\":\"" + diffMinutes
-						+ "mins\",\"serviceTime\":\"" + timesString + "\" }";
+						+ "mins\",\"serviceTime\":\"" + timesString + "\",\"recipient\":\""+ongoingJourney.getTraveller()+"\" }";
 				HashMap parameters = new HashMap();
 				parameters.put("type", "RealTime");
 				parameters.put("service", ongoingJourney.getBusRoutes().get(i));
