@@ -118,35 +118,52 @@ public class MessageHandler {
 
 		String xml = nxt.getLiveDepartures(ongoingJourney.getBusStopCode());
 		// System.out.println(xml);
-		String closesToTheJourneyStart = "";
-		long busTime = -1;
-
-		int tempMinutes = 10;
 
 		for (int i = 0; i < ongoingJourney.getBusRoutes().size(); i++) {
+			String closesToTheJourneyStart = "";
+			long busTime = -1;
+			int tempMinutes = 10;
 
 			Parser pars = new Parser(xml, (String) ongoingJourney
 					.getBusRoutes().get(i));
 			pars.runParsing();
 			ArrayList<String> times = pars.getParsingResult();
+			logger.debug("Retrieved times for service "
+					+ ongoingJourney.getBusRoutes().get(i) + ": "
+					+ times.toString());
+
+			if (times.isEmpty()) {
+				logger.info("Error with response from NextBus API so not sending any real time message for journey "
+						+ ongoingJourney.getID()
+						+ " route "
+						+ ongoingJourney.getBusRoutes().get(i));
+				continue;
+			}
 
 			if (!times.isEmpty()) {
 
 				for (int j = 0; j < times.size(); j++) {
-					Calendar dt = DatatypeConverter.parseDateTime(times.get(j));
+					try {
+						Calendar dt = DatatypeConverter.parseDateTime(times
+								.get(j));
+						// System.out.println
+						// (ongoingJourney.getStartMinutes());
 
-					// System.out.println (ongoingJourney.getStartMinutes());
+						int journeyStart = ongoingJourney.getStartMinutes();
+						int minutes = dt.get(Calendar.MINUTE)
+								+ (dt.get(Calendar.HOUR_OF_DAY) * 60);
 
-					int journeyStart = ongoingJourney.getStartMinutes();
-					int minutes = dt.get(Calendar.MINUTE)
-							+ (dt.get(Calendar.HOUR_OF_DAY) * 60);
-
-					if (tempMinutes >= Math.abs((journeyStart - minutes))) {
-						tempMinutes = Math.abs((journeyStart - minutes));
-						SimpleDateFormat format1 = new SimpleDateFormat("HH:mm");
-						String formatted = format1.format(dt.getTime());
-						busTime = (dt.getTime()).getTime();
-						closesToTheJourneyStart = formatted;
+						if (tempMinutes >= Math.abs((journeyStart - minutes))) {
+							tempMinutes = Math.abs((journeyStart - minutes));
+							SimpleDateFormat format1 = new SimpleDateFormat(
+									"HH:mm");
+							String formatted = format1.format(dt.getTime());
+							busTime = (dt.getTime()).getTime();
+							closesToTheJourneyStart = formatted;
+						}
+					} catch (IllegalArgumentException iae) {
+						logger.error("Error parsing DateTime from NextBus API - value ("
+								+ times.get(j) + ") error: " + iae.getMessage());
 					}
 
 				}
@@ -173,7 +190,9 @@ public class MessageHandler {
 							+ "\",\"duration\":\""
 							+ diffMinutes
 							+ "mins\",\"serviceTime\":\""
-							+ closesToTheJourneyStart + "\",\"recipient\":\""+ongoingJourney.getTraveller()+"\" }";
+							+ closesToTheJourneyStart
+							+ "\",\"recipient\":\""
+							+ ongoingJourney.getTraveller() + "\" }";
 					HashMap parameters = new HashMap();
 					parameters.put("type", "RealTime");
 					parameters.put("service", ongoingJourney.getBusRoutes()
@@ -181,7 +200,7 @@ public class MessageHandler {
 					parameters.put("serviceTime", closesToTheJourneyStart);
 
 					msg = nlg.getGeneratedMessage(data);
-					System.out.println(msg);
+					logger.info("Received message to send " + msg);
 					if (!msg.equals("error")) {
 
 						// msg = "Service "+ongoingJourney.getBusRoutes().get(i)
@@ -208,7 +227,6 @@ public class MessageHandler {
 								newMessage, alreadySentMessages);
 
 						if (dispatchDecision) {
-							System.out.println(msg);
 							if (logger.isInfoEnabled()) {
 								logger.info("Sending realTime message more than 5 minutes before the journey to user: "
 										+ ongoingJourney.getTraveller());
@@ -266,8 +284,12 @@ public class MessageHandler {
 					.getBusRoutes().get(i));
 			pars.runParsing();
 			ArrayList<String> times = pars.getParsingResult();
-			if (times.isEmpty()){
-				logger.info("Error with response from NextBus API so not sending any real time message for journey " + ongoingJourney.getID());
+			if (times.isEmpty()) {
+				logger.error("Error with response from NextBus API so not sending any real time message for journey "
+						+ ongoingJourney.getID()
+						+ " route "
+						+ ongoingJourney.getBusRoutes().get(i));
+				continue;
 			}
 
 			// System.out.println (times);
@@ -289,8 +311,8 @@ public class MessageHandler {
 						timesString = timesString + "," + formatted;
 					}
 				} catch (IllegalArgumentException p) {
-					System.out
-							.println("First api returned corrupted value for one of the expected times");
+					logger.error("Error parsing DateTime from NextBus API - value ("
+							+ times.get(j) + ") error: " + p.getMessage());
 				}
 
 			}
@@ -312,7 +334,9 @@ public class MessageHandler {
 				String data = "{\"type\":\"RealTime\",\"service\":\"service "
 						+ ongoingJourney.getBusRoutes().get(i)
 						+ "\",\"duration\":\"" + diffMinutes
-						+ "mins\",\"serviceTime\":\"" + timesString + "\",\"recipient\":\""+ongoingJourney.getTraveller()+"\" }";
+						+ "mins\",\"serviceTime\":\"" + timesString
+						+ "\",\"recipient\":\"" + ongoingJourney.getTraveller()
+						+ "\" }";
 				HashMap parameters = new HashMap();
 				parameters.put("type", "RealTime");
 				parameters.put("service", ongoingJourney.getBusRoutes().get(i));
@@ -403,7 +427,7 @@ public class MessageHandler {
 				// System.out.println ("Difference between send time of last "
 				// +newMessage+ " and new one is " + diffMinutes+ "minutes");
 
-				if (diffMinutes > 5 && diffMinutes < (60*12)) {
+				if (diffMinutes > 5 && diffMinutes < (60 * 12)) {
 					if (newMessageJourneyID.equals(sentMessageJourneyID)) {
 						// already sent for this journey
 						decision = false;

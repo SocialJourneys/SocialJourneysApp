@@ -62,10 +62,11 @@ public class EventNlgBridge {
 	
 	public Map<String, Map<String, Set<String>>> extractDetailsForNlg_Generic ( ResultSet results) {
 		
-		
-		
 		Map<String, Map<String, Set<String>>> bigNlgData = new HashMap<String, Map<String, Set<String>>>();
 
+		if (results == null)
+			return bigNlgData;
+		
 		for (; results.hasNext();) {
 		QuerySolution soln = results.next();
 		

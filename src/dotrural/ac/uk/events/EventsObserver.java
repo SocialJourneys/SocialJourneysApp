@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.http.client.ClientProtocolException;
+import org.apache.jena.atlas.web.HttpException;
 import org.apache.log4j.Logger;
 
 import com.hp.hpl.jena.query.DatasetAccessor;
@@ -199,14 +200,18 @@ public class EventsObserver extends Thread {
 				+ "filter (?now >= ?startdatetime)"
 				+ "   ?e event:time/timeline:endsAtDateTime ?enddatetime.\n"
 				+ "filter (?now <= ?enddatetime)" + "}  \n";
-
+		ResultSet results = null;
+		try{
 		DatasetAccessor da = DatasetAccessorFactory
 				.createHTTP(PredefinedConstants.FUSEKI_URI);
 		queryExecution = QueryExecutionFactory.create(queryString,
 				da.getModel());
 
-		ResultSet results = queryExecution.execSelect();
-
+		 results = queryExecution.execSelect();
+		} catch (HttpException except){
+			System.err.println("Unable to connect to fuseki - " + except.getMessage());
+		}
+		
 		return results;
 	}
 

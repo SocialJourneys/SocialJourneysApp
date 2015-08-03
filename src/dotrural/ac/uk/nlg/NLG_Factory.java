@@ -141,30 +141,32 @@ String data = "{";
 		data = data+ "}"; */
 		
 		String msg ="error";
-		try {
+//		try {
 			//data = "{\"startsAtDateTime\":\"2015-05-27T17:45:38\",\"service\":\"Service 1\",\"primaryLocation\":\"Faulds Gate\",\"place\":\"Gardner Drive\",\"type\":\"PublicTransportDelay\",\"delayLength\":\"0 mins\"}";
 			//data = "{\"type\":\"PublicTransportDelay\",\"service\":\"service 1\",\"hasFactor\":\"road works\",\"primaryLocation\":\"st machar dr\",\"place\":\"road 1, road2\",\"delayLength\":\"0 mins\",\"startsAtDateTime\":\"2015-03-08T19:59:59\"}";
 			System.out.println(data);
 			msg = HttpRequests.sendPostRequest(PredefinedConstants.NLG_SERVICE_URI, data);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+			if ("".equals(msg))msg="error";
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		
 		return msg;
 	}
 
 	public String getGeneratedMessage (String nlgData) {
 		String msg ="error";
-		try {
+//		try {
 			//data = "{\"startsAtDateTime\":\"2015-05-27T17:45:38\",\"service\":\"Service 1\",\"primaryLocation\":\"Faulds Gate\",\"place\":\"Gardner Drive\",\"type\":\"PublicTransportDelay\",\"delayLength\":\"0 mins\"}";
 			//data = "{\"type\":\"PublicTransportDelay\",\"service\":\"service 1\",\"hasFactor\":\"road works\",\"primaryLocation\":\"st machar dr\",\"place\":\"road 1, road2\",\"delayLength\":\"0 mins\",\"startsAtDateTime\":\"2015-03-08T19:59:59\"}";
-			System.out.println(nlgData);
+			System.out.println("NLG generated messge data " + nlgData);
 			msg = HttpRequests.sendPostRequest(PredefinedConstants.NLG_SERVICE_URI, nlgData);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+			if ("".equals(msg))msg="error";
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		
 		return msg;
 		

@@ -46,6 +46,7 @@ public class NextBusAdaptor {
 		String body = String.format(REQUEST_XML, now, USER_ID, now, naptanCode);
 		//System.out.println(body);
 		String results = makeRequest(body);
+		System.out.println(results);
 		return results;
 	}
 
@@ -63,7 +64,7 @@ public class NextBusAdaptor {
 	}
 	
 	public static void main(String[] args) throws ClientProtocolException, IOException {
-		Parser pars = new Parser (new NextBusAdaptor().getLiveDepartures("639003662"),"2");
+		Parser pars = new Parser (new NextBusAdaptor().getLiveDepartures("23234548"),"2");
 		
 		
 		pars.runParsing();

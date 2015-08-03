@@ -59,9 +59,9 @@ public class HttpRequests {
 		
 	}
 	
-	public static String sendPostRequest (String url, String data) throws IOException {
-		
-		
+	public static String sendPostRequest (String url, String data) {
+		String res = "";
+		try {
 		URL obj = new URL(url);
 		
 		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -95,11 +95,14 @@ public class HttpRequests {
 		in.close();
  
 		//print result
-		String res = null;
+	
 		if (response.toString() != null) {
 			res = response.toString();
 		}
-		return res;
+		} catch (IOException ioe){
+			System.err.println("Error with post request to " + url + " message " + ioe.getMessage());
+		}
+		return res.trim();
 	}
 	
 public static String sendAuthorisedPostRequest (String url, String data, String USER_ID,String PASSWORD) throws IOException {
