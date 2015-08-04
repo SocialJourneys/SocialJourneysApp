@@ -17,9 +17,9 @@ public class EventsEffectsOnBusServicesChecker {
 		
 		/// the code for handling the relations beteen busroutes and tweets goes here 
 		
-		 Model newTriples =  ModelFactory.createDefaultModel();
+		Model newTriples =  ModelFactory.createDefaultModel();
 		 
-		 
+		mainEventsStorage.add(newTriples); 
 		
 		
 	}
