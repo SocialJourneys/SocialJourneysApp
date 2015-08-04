@@ -23,8 +23,6 @@ public class EventsEffectsOnBusServicesChecker {
 		//if not inferences between bus services and events exist, try use the street names and bus stops
 		if (!inferenecesBetweenBusServicesAndEventsExist) {
 		
-		
-		
 		/// the code for handling the relations beteen busroutes and tweets goes here 
 		
 		Model newTriples =  ModelFactory.createDefaultModel();
