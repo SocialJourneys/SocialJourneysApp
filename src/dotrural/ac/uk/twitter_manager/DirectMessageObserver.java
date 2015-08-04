@@ -230,6 +230,10 @@ public class DirectMessageObserver  extends Thread{
 			    Model m =  ModelFactory.createDefaultModel().read(new ByteArrayInputStream(response.getBytes()), null);
 				da.add(m);
 				
+				 //now check if the the annotations contain any event that relates to bus services
+				 EventsEffectsOnBusServicesChecker ebs = new EventsEffectsOnBusServicesChecker ();
+				 ebs.checkAnnotationsAndInfer (da,m);
+				
 				}
 				else 
 				{
