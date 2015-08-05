@@ -194,7 +194,7 @@ public class EventsObserver extends Thread {
 				+ "?e <http://vocab.org/transit/terms/service> <http://sj.abdn.ac.uk/resource/basemap/busLines/ABDN_"
 				+ serviceName
 				+ ">. "
-				+ "filter (?eventType = td:PublicTransportDelay || ?eventType = td:PublicTransportDiversion ).\n"
+				+ "?eventType rdfs:subClassOf event:Event.\n"
 				+ "   ?e event:time/timeline:beginsAtDateTime ?startdatetime.\n"
 				+ "bind (now() as ?now)"
 				+ "filter (?now >= ?startdatetime)"
