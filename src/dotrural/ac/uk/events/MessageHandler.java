@@ -103,6 +103,8 @@ public class MessageHandler {
 			HashMap sentMessages, Journey ongoingJourney)
 			throws ClientProtocolException, IOException {
 
+		logger.info("handling pre 5 messages");
+		
 		if (!sentMessages.keySet().contains(ongoingJourney.getTraveller())) {
 			HashMap messages = new HashMap<String, String>();
 			sentMessages.put(ongoingJourney.getTraveller(), messages);
@@ -128,7 +130,7 @@ public class MessageHandler {
 					.getBusRoutes().get(i));
 			pars.runParsing();
 			ArrayList<String> times = pars.getParsingResult();
-			logger.debug("Retrieved times for service "
+			logger.info("Retrieved times for service "
 					+ ongoingJourney.getBusRoutes().get(i) + ": "
 					+ times.toString());
 

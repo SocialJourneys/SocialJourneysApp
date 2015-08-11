@@ -59,7 +59,7 @@ public class TweetObserver extends Thread {
 			DbConnect connectionObject = new DbConnect();
 			try {
 				pst = connectionObject.getDbConnect().prepareStatement(
-						"SELECT original_tweet_id,author,text,time_stamp FROM tweet order by time_stamp desc limit 10");
+						"SELECT original_tweet_id,author,text,time_stamp FROM tweet order by time_stamp desc limit 5");
 				rs = pst.executeQuery();
 
 				connectionObject.closeDbConnect();

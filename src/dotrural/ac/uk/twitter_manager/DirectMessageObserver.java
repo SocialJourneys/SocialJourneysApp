@@ -139,7 +139,7 @@ public class DirectMessageObserver extends Thread {
 		Twitter twitter = new TwitterFactory().getInstance();
 		try {
 			Paging pg = new Paging();
-			pg.setCount(25);
+			pg.setCount(5);
 			// id of the last direct message from the previous study
 			long lng = Long.parseLong(PredefinedConstants.OLDEST_DIRECT_MESSAGE_ID_TO_LOOK_UP);
 			pg.setSinceId(lng);
