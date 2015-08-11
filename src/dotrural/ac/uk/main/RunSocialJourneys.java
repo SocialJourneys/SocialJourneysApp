@@ -59,14 +59,14 @@ public class RunSocialJourneys {
 		}
 		 //start observing new tweets in the database and trigger annotation generation
          Thread tweetObserver = new TweetObserver ();
-         // turn this back on  	 tweetObserver.start();
+         tweetObserver.start();
 		 
 	
 		if(logger.isInfoEnabled()){
 			logger.info("Initiating the direct message observer. ");
 		} 
-	Thread directMsgObserver  = new DirectMessageObserver ();
-   // turn this back on  directMsgObserver.start();
+		Thread directMsgObserver  = new DirectMessageObserver ();
+		directMsgObserver.start();
 	
 		if(logger.isInfoEnabled()){
 			logger.info("Initiating the events observer. ");
