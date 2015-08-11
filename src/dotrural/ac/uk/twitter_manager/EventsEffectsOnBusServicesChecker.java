@@ -10,9 +10,11 @@ import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.query.ResultSetFormatter;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
@@ -28,11 +30,10 @@ public class EventsEffectsOnBusServicesChecker {
 		DatasetAccessor busServicesStoreAccessor = DatasetAccessorFactory
 				.createHTTP(PredefinedConstants.FUSEKI_BUS_SERVICES_URI);
 
-		serviceProperty = ResourceFactory
-				.createProperty("http://vocab.org/transit/terms/service");
+		serviceProperty = ResourceFactory.createProperty("http://vocab.org/transit/terms/service");
 
 		boolean inferenecesBetweenBusServicesAndEventsExist = messageAnnotationsReturnedByKIMandInferences
-				.containsLiteral(null, serviceProperty, null);
+				.contains(null, serviceProperty);
 
 		// if not inferences between bus services and events exist, try use the
 		// street names and bus stops
@@ -45,32 +46,27 @@ public class EventsEffectsOnBusServicesChecker {
 
 			ArrayList<String> resources = getStreetAndBusStopURIs(messageAnnotationsReturnedByKIMandInferences);
 
-			ArrayList<Resource> relevantBusroutes = matchBusRouteToStreetOrBusStop(
-					resources, busServicesStoreAccessor.getModel());
+			ArrayList<Resource> relevantBusroutes = matchBusRouteToStreetOrBusStop(resources,
+					busServicesStoreAccessor.getModel());
 
 			if (!relevantBusroutes.isEmpty()) {
-				createTriples(messageAnnotationsReturnedByKIMandInferences,
-						mainEventsStorage, relevantBusroutes);
+				createTriples(messageAnnotationsReturnedByKIMandInferences, mainEventsStorage, relevantBusroutes);
 			}
 
 		}
 
 	}
 
-	private void createTriples(
-			Model messageAnnotationsReturnedByKIMandInferences,
-			DatasetAccessor mainEventsStorage,
+	private void createTriples(Model messageAnnotationsReturnedByKIMandInferences, DatasetAccessor mainEventsStorage,
 			ArrayList<Resource> relevantBusroutes) {
 		OntModel newTriples = ModelFactory.createOntologyModel();
 		QueryExecution queryExecution;
 
-		String queryString = "Select ?event"
-				+ "WHERE {"
+		String queryString = "Select ?event WHERE {"
 				+ "?event <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://purl.org/NET/c4dm/event.owl#Event>. "
 				+ "}";
 
-		queryExecution = QueryExecutionFactory.create(queryString,
-				messageAnnotationsReturnedByKIMandInferences);
+		queryExecution = QueryExecutionFactory.create(queryString, messageAnnotationsReturnedByKIMandInferences);
 		ResultSet results = queryExecution.execSelect();
 
 		while (results.hasNext()) {
@@ -80,15 +76,13 @@ public class EventsEffectsOnBusServicesChecker {
 			if (rs.get(varName).isResource()) {
 
 				for (int i = 0; i < relevantBusroutes.size(); i++) {
-					newTriples.add(rs.get(varName).asResource(),
-							serviceProperty, relevantBusroutes.get(i));
+					newTriples.add(rs.get(varName).asResource(), serviceProperty, relevantBusroutes.get(i));
 				}
 				/*
 				 * Individual eventResource =
 				 * newTriples.createIndividual(rs.get(
-				 * varName).asResource().getURI(),
-				 * newTriples.createClass("http://purl.org/NET/c4dm/event.owl#Event"
-				 * ));
+				 * varName).asResource().getURI(), newTriples.createClass(
+				 * "http://purl.org/NET/c4dm/event.owl#Event" ));
 				 * 
 				 * for (int i = 0; i < relevantBusroutes.size(); i++) {
 				 * 
@@ -115,8 +109,7 @@ public class EventsEffectsOnBusServicesChecker {
 
 		QueryExecution queryExecution;
 
-		String queryString = "Select ?resource"
-				+ "WHERE {"
+		String queryString = "Select ?resource WHERE {"
 				+ "{?resource <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sj.abdn.ac.uk/ontology/Highway>.} "
 				+ "UNION"
 				+ "{?resource <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://transport.data.gov.uk/def/naptan/Stop>.}"
@@ -124,25 +117,29 @@ public class EventsEffectsOnBusServicesChecker {
 
 		queryExecution = QueryExecutionFactory.create(queryString, model);
 		ResultSet results = queryExecution.execSelect();
-
-		while (results.hasNext()) {
+		while (results.hasNext()){
 			QuerySolution rs = results.next();
+			if (rs==null){
+				System.err.println("null result set");
+				continue;
+			}
 			// Iterator <String> it = rs.varNames();
-			String varName = "resource";
-			if (rs.get(varName).isResource()) {
-
-				if (!result.contains(rs.get(varName).asResource().getURI())) {
-					result.add(rs.get(varName).asResource().getURI());
+			String varName = results.getResultVars().get(0);
+			RDFNode resource = rs.get(varName);
+			if (resource != null && resource.isResource()) {
+				String uri = resource.asResource().getURI();
+				if (!result.contains(uri)) {
+					result.add(uri);
 				}
 			}
 
 		}
 
 		return result;
+
 	}
 
-	private ArrayList<Resource> matchBusRouteToStreetOrBusStop(
-			ArrayList<String> resourcesURIs, Model model) {
+	private ArrayList<Resource> matchBusRouteToStreetOrBusStop(ArrayList<String> resourcesURIs, Model model) {
 		ArrayList<Resource> relevantBusroutes = new ArrayList<Resource>();
 		QueryExecution queryExecution;
 
@@ -150,15 +147,11 @@ public class EventsEffectsOnBusServicesChecker {
 
 			String resourceInstanceURI = resourcesURIs.get(i);
 
-			String queryString = "Select ?route ?label "
-					+ "WHERE {"
+			String queryString = "Select ?route ?label  WHERE {"
 					+ "?route <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://sj.abdn.ac.uk/ontology/BusRoute>. "
-					+ "{?route <http://sj.abdn.ac.uk/ontology/BusRoute#includesWay> <"
-					+ resourceInstanceURI
-					+ ">.} "
-					+ "UNION"
-					+ "{?route <http://sj.abdn.ac.uk/ontology/BusRoute#includesStop> <"
-					+ resourceInstanceURI + ">.}" + "}";
+					+ "{?route <http://sj.abdn.ac.uk/ontology/BusRoute#includesWay> <" + resourceInstanceURI + ">.} "
+					+ "UNION" + "{?route <http://sj.abdn.ac.uk/ontology/BusRoute#includesStop> <" + resourceInstanceURI
+					+ ">.}" + "}";
 
 			queryExecution = QueryExecutionFactory.create(queryString, model);
 			ResultSet results = queryExecution.execSelect();
@@ -169,8 +162,7 @@ public class EventsEffectsOnBusServicesChecker {
 				String varName = "route";
 				if (rs.get(varName).isResource()) {
 
-					if (!relevantBusroutes.contains(rs.get(varName)
-							.asResource().getURI())) {
+					if (!relevantBusroutes.contains(rs.get(varName).asResource().getURI())) {
 						relevantBusroutes.add(rs.get(varName).asResource());
 					}
 				}
