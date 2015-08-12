@@ -62,7 +62,7 @@ public class Parser extends  DefaultHandler {
 			sp.parse(new InputSource(new StringReader(xml)), this);
 			
 		}catch(SAXException se) {
-			System.out.println ("problem with parsing");
+			System.err.println("Problem with parsing doc returned by NextBus API - " + se.getLocalizedMessage());
 			//se.printStackTrace();
 		}catch(ParserConfigurationException pce) {
 			pce.printStackTrace();
