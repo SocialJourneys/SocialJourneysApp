@@ -24,6 +24,7 @@ import com.hp.hpl.jena.query.DatasetAccessor;
 import com.hp.hpl.jena.query.DatasetAccessorFactory;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.vocabulary.RDF;
@@ -244,12 +245,17 @@ public class DirectMessageObserver extends Thread {
 
 					if (eventAnnotationsPresent) {
 
-						da.add(m);
+						Property serviceProperty = ResourceFactory
+								.createProperty("http://vocab.org/transit/terms/service");
 
-						// now check if the the annotations contain any event
-						// that relates to bus services
-						EventsEffectsOnBusServicesChecker ebs = new EventsEffectsOnBusServicesChecker();
-						ebs.checkAnnotationsAndInfer(da, m);
+						boolean inferenecesBetweenBusServicesAndEventsExist = da.getModel().contains(null,
+								serviceProperty);
+
+						if (inferenecesBetweenBusServicesAndEventsExist) {
+							// add to fuseki store
+							da.add(m);
+						}
+
 					}
 
 				} else {
