@@ -122,7 +122,7 @@ public class DirectMessageObserver extends Thread {
 			pst.setString(3, msg.getText());
 
 			long time = (msg.getCreatedAt()).getTime();
-			pst.setTimestamp(4, new Timestamp(time));
+			pst.setTimestamp(4, new Timestamp( time));
 
 			pst.setString(5, msg.getSenderScreenName());
 

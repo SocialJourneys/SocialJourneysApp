@@ -199,7 +199,12 @@ public class EventsObserver extends Thread {
 				+ "bind (now() as ?now)"
 				+ "filter (?now >= ?startdatetime)"
 				+ "   ?e event:time/timeline:endsAtDateTime ?enddatetime.\n"
-				+ "filter (?now <= ?enddatetime)" + "}  \n";
+				+ "filter (?now <= ?enddatetime)" + ""
+						+ "?e <http://www.w3.org/ns/prov#wasDerivedFrom> ?instance. "
+						+ "service <http://sj.abdn.ac.uk/ozStudyD2R/sparql> { "
+						+ "?instance  <http://www.dotrural.ac.uk/irp/uploads/ontologies/bottari#messageTimeStamp> ?reportTime.}"
+						+ "}  \n";
+		System.out.println(queryString);
 		ResultSet results = null;
 		try{
 		DatasetAccessor da = DatasetAccessorFactory
@@ -209,7 +214,7 @@ public class EventsObserver extends Thread {
 
 		 results = queryExecution.execSelect();
 		} catch (HttpException except){
-			System.err.println("Unable to connect to fuseki - " + except.getMessage());
+			logger.error("Unable to connect to event fuseki - " + except.getMessage());
 		}
 		
 		return results;
@@ -228,7 +233,7 @@ public class EventsObserver extends Thread {
 
 			Map map = generatedResponses.getParametersForNLG(temp);
 
-			// System.out.println (map);
+			System.out.println (map);
 
 			if (!map.isEmpty()) {
 

@@ -62,6 +62,9 @@ public class EventsEffectsOnBusServicesChecker {
 		OntModel newTriples = ModelFactory.createOntologyModel();
 		QueryExecution queryExecution;
 
+		messageAnnotationsReturnedByKIMandInferences.write(System.out);
+		System.out.println("------------------");
+		
 		String queryString = "Select ?event WHERE {"
 				+ "?event <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://purl.org/NET/c4dm/event.owl#Event>. "
 				+ "}";
@@ -74,9 +77,10 @@ public class EventsEffectsOnBusServicesChecker {
 			// Iterator <String> it = rs.varNames();
 			String varName = "event";
 			if (rs.get(varName).isResource()) {
-
+				Resource r = rs.get(varName).asResource();
+				String rUri= r.getURI();
 				for (int i = 0; i < relevantBusroutes.size(); i++) {
-					newTriples.add(rs.get(varName).asResource(), serviceProperty, relevantBusroutes.get(i));
+					newTriples.add(r, serviceProperty, relevantBusroutes.get(i));
 				}
 				/*
 				 * Individual eventResource =

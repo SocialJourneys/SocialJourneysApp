@@ -144,7 +144,7 @@ String data = "{";
 //		try {
 			//data = "{\"startsAtDateTime\":\"2015-05-27T17:45:38\",\"service\":\"Service 1\",\"primaryLocation\":\"Faulds Gate\",\"place\":\"Gardner Drive\",\"type\":\"PublicTransportDelay\",\"delayLength\":\"0 mins\"}";
 			//data = "{\"type\":\"PublicTransportDelay\",\"service\":\"service 1\",\"hasFactor\":\"road works\",\"primaryLocation\":\"st machar dr\",\"place\":\"road 1, road2\",\"delayLength\":\"0 mins\",\"startsAtDateTime\":\"2015-03-08T19:59:59\"}";
-			System.out.println(data);
+			System.out.println("Event data to send to nlg: " + data);
 			msg = HttpRequests.sendPostRequest(PredefinedConstants.NLG_SERVICE_URI, data);
 			if ("".equals(msg))msg="error";
 //		} catch (IOException e) {

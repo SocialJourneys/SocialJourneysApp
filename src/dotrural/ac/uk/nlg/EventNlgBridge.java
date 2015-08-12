@@ -87,6 +87,7 @@ public class EventNlgBridge {
 		   populateNlgData(nlgData, soln, "type", "eventType");
 		   populateNlgData(nlgData, soln, "startsAtDateTime", "startdatetime");
 		   populateNlgData(nlgData, soln, "endsAtDateTime", "endsdatetime");
+		   populateNlgData(nlgData, soln, "reportTime", "reportTime");
 		   bigNlgData.put(key, nlgData);
 
 		/*populateNlgData(nlgData, soln, soln.getResource("p").getLocalName(), "olabel");
