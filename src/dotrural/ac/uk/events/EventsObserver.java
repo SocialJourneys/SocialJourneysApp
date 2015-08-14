@@ -201,7 +201,6 @@ public class EventsObserver extends Thread {
 						+ "service <http://sj.abdn.ac.uk/ozStudyD2R/sparql> { "
 						+ "?instance  <http://www.dotrural.ac.uk/irp/uploads/ontologies/bottari#messageTimeStamp> ?reportTime.}"
 						+ "}  \n";
-		System.out.println(queryString);
 		ResultSet results = null;
 		try{
 		DatasetAccessor da = DatasetAccessorFactory

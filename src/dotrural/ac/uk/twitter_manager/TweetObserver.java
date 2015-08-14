@@ -98,6 +98,7 @@ public class TweetObserver extends Thread {
 						// conntact fuseki
 						DatasetAccessor da = DatasetAccessorFactory.createHTTP(PredefinedConstants.FUSEKI_URI);
 						// da.getModel().write(System.out);
+						
 						boolean answer = da.getModel().containsResource(r);
 
 						if (answer) {

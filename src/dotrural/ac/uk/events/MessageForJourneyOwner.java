@@ -30,10 +30,10 @@ public class MessageForJourneyOwner {
 
 	public HashMap getParametersUsed(boolean removeReportTime) {
 		HashMap map = (HashMap) parameters.clone();
-		System.out.println("Param map " + parameters.toString());
+//		System.out.println("Param map " + parameters.toString());
 		if (removeReportTime) {
 			map.remove("reportTime");
-			System.out.println("Returning map " + map.toString());
+//			System.out.println("Returning map " + map.toString());
 		}
 		return map;
 	}
