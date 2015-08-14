@@ -31,7 +31,7 @@ public class NLG_Factory {
 		}*/
 	}
 	
-	public Map  getParametersForNLG (ResultSet result) {
+	public Map<String, Map<String, Set<String>>>   getParametersForNLG (ResultSet result) {
 		
 		Map<String, Map<String, Set<String>>> nlgData;
 		

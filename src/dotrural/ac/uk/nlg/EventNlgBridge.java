@@ -76,18 +76,30 @@ public class EventNlgBridge {
 		    nlgData = new HashMap<String, Set<String>>();
 		   }
 		//  System.out.println(soln.getResource("p").getLocalName());
-		  if (!(soln.getResource("p").getLocalName().equals("type"))){
+		/*  if (!(soln.getResource("p").getLocalName().equals("type"))){
 			 
 		   populateNlgData(nlgData, soln, soln.getResource("p").getLocalName(), "olabel");
-		  }
-		  else {
-			  System.out.println("HEY");
-		  }
+		  }*/
+		  
 		//   populateNlgData(nlgData, soln, "event", "eventLabel");
-		   populateNlgData(nlgData, soln, "type", "eventType");
+		   //populateNlgData(nlgData, soln, "type", "eventType");
+//		   Set<String> typeSet = new HashSet<String>();
+//		   typeSet.add("GeneralDisruption");
+//		   nlgData.put("type", typeSet);
+		   Set<String> cSet = new HashSet<String>();
+		   cSet.add("0.5");
+		   nlgData.put("certainty", cSet);
 		   populateNlgData(nlgData, soln, "startsAtDateTime", "startdatetime");
-		   populateNlgData(nlgData, soln, "endsAtDateTime", "endsdatetime");
-		   populateNlgData(nlgData, soln, "reportTime", "reportTime");
+		   populateNlgData(nlgData, soln, "endsAtDateTime", "enddatetime");
+		   populateNlgData(nlgData, soln, "reportedAt", "reportTime");
+		   String type = populateNlgData(nlgData, soln, "type", "elabel").toLowerCase();
+		   // this is some of the worst hacking code ever, but if it works....
+		   if ("running late delay delays diverted diversions diversions".indexOf(type) <0){
+				   populateNlgData(nlgData, "hasFactor", type);
+		   }
+//		   populateNlgData(nlgData, soln, "hasFactor", "elabel");
+		   populateNlgData(nlgData, soln, "primaryLocation", "primaryLocation");
+		   populateNlgData(nlgData, soln, "delayLength", "delayLength");
 		   bigNlgData.put(key, nlgData);
 
 		/*populateNlgData(nlgData, soln, soln.getResource("p").getLocalName(), "olabel");
@@ -101,19 +113,30 @@ public class EventNlgBridge {
 	}
 
 	private void populateNlgData(Map<String, Set<String>> nlgData,
+			String key, String value) {
+		Set<String> values = nlgData.get(key);
+		if (values == null)
+			values = new HashSet<String>();
+		values.add(value);
+		nlgData.put(key, values);		
+	}
+
+	private String populateNlgData(Map<String, Set<String>> nlgData,
 			QuerySolution soln, String mapKey, String variable) {
+		String value = "";
 		Set<String> values = nlgData.get(mapKey);
 		if (values == null)
 			values = new HashSet<String>();
 		RDFNode object = soln.get(variable);
 		if (object != null) {
 			if (object.isResource()) {
-				values.add(object.asResource().getLocalName());
+				values.add(value = object.asResource().getLocalName());
 			} else if (object.isLiteral()) {
-				values.add(object.asLiteral().getValue().toString());
+				values.add(value = object.asLiteral().getValue().toString());
 			}
 		}
 		nlgData.put(mapKey, values);
+		return value;
 	}
 
 }

@@ -3,10 +3,9 @@ package dotrural.ac.uk.events;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -17,19 +16,15 @@ import org.apache.log4j.Logger;
 
 import com.hp.hpl.jena.query.DatasetAccessor;
 import com.hp.hpl.jena.query.DatasetAccessorFactory;
-import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 
 import dotrural.ac.uk.constants.PredefinedConstants;
 import dotrural.ac.uk.journeys.Journey;
 import dotrural.ac.uk.journeys.JourneyObserver;
-import dotrural.ac.uk.main.RunSocialJourneys;
 import dotrural.ac.uk.nlg.NLG_Factory;
 import dotrural.ac.uk.store.JenaStore;
-import dotrural.ac.uk.utils.HttpRequests;
 
 public class EventsObserver extends Thread {
 
@@ -190,7 +185,7 @@ public class EventsObserver extends Thread {
 				+ "PREFIX td: <http://purl.org/td/transportdisruption#>\n"
 				+ "SELECT *\n"
 				+ "WHERE {\n"
-				+ " ?e a ?eventType; ?p ?o. ?o rdfs:label ?olabel."
+				+ " ?e a ?eventType. ?e rdfs:label ?elabel."
 				+ "?e <http://vocab.org/transit/terms/service> <http://sj.abdn.ac.uk/resource/basemap/busLines/ABDN_"
 				+ serviceName
 				+ ">. "
@@ -200,6 +195,8 @@ public class EventsObserver extends Thread {
 				+ "filter (?now >= ?startdatetime)"
 				+ "   ?e event:time/timeline:endsAtDateTime ?enddatetime.\n"
 				+ "filter (?now <= ?enddatetime)" + ""
+						+ "optional {?e <http://purl.org/td/transportdisruptionprops/delayLength>/rdfs:label ?delayLength.} "
+						+ "optional {?e <http://purl.org/td/transportdisruptionprops#primaryLocation>/rdfs:label ?primaryLocation.} "
 						+ "?e <http://www.w3.org/ns/prov#wasDerivedFrom> ?instance. "
 						+ "service <http://sj.abdn.ac.uk/ozStudyD2R/sparql> { "
 						+ "?instance  <http://www.dotrural.ac.uk/irp/uploads/ontologies/bottari#messageTimeStamp> ?reportTime.}"
@@ -232,9 +229,17 @@ public class EventsObserver extends Thread {
 			NLG_Factory generatedResponses = new NLG_Factory();
 
 			Map map = generatedResponses.getParametersForNLG(temp);
-
-			System.out.println (map);
-
+			
+			System.out.println("Map is  " + map);
+			
+			for (Object key : map.keySet()){
+				Map value = (Map)map.get(key);
+				Set<String> recipientSet = new HashSet<String>();
+				recipientSet.add(journey.getTraveller());
+				value.put("recipient", recipientSet);
+				map.put(key, value);
+			}
+			
 			if (!map.isEmpty()) {
 
 				ArrayList tempList = new ArrayList();

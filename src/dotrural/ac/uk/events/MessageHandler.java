@@ -6,7 +6,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.xml.bind.DatatypeConverter;
 
@@ -26,18 +27,14 @@ public class MessageHandler {
 			HashMap sentMessages, Journey ongoingJourney) {
 
 		int count = 0;
-		Iterator it = result.keySet().iterator();
-		while (it.hasNext()) {
-
-			String service = (String) it.next();
+		for (Object s : result.keySet()){
+			String service = s.toString();
 			System.out.println(service);
 			HashMap delaysReported = (HashMap) result.get(service);
 
-			Iterator eventsIt = delaysReported.keySet().iterator();
+			for (Object eventObj : delaysReported.keySet()){
 
-			while (eventsIt.hasNext()) {
-
-				String eventId = (String) eventsIt.next();
+				String eventId = eventObj.toString();
 
 				if (!sentMessages.keySet().contains(
 						ongoingJourney.getTraveller())) {
@@ -53,15 +50,14 @@ public class MessageHandler {
 				}
 
 				HashMap parameters = (HashMap) delaysReported.get(eventId);
-				NLG_Factory nlg = new NLG_Factory();
-				String msg = nlg.getGeneratedMessage(parameters);
-
+				Set services = new HashSet();
+				services.add("service " + service);
+				parameters.put("service", services);
+				
 				MessageForJourneyOwner newMessage = new MessageForJourneyOwner();
 
 				newMessage.setParametersUsed(parameters);
-
 				// String msg ="nlg service not working";
-				newMessage.setMessage(msg);
 
 				Date dt = new Date();
 				long msgTime = dt.getTime();
@@ -78,15 +74,19 @@ public class MessageHandler {
 						alreadySentMessages);
 
 				if (dispatchDecision) {
+					NLG_Factory nlg = new NLG_Factory();
+					String msg = nlg.getGeneratedMessage(parameters);
+					newMessage.setMessage(msg);
+
 					// System.out.println (msg);
 					if (logger.isInfoEnabled()) {
-						logger.info("Sending doruption message to user: "
+						logger.info("Sending disruption message to user: "
 								+ ongoingJourney.getTraveller());
 						logger.info("Message: " + newMessage.getMessage());
 						logger.info("Journey ID: " + ongoingJourney.getID());
 						logger.info("Event ID: " + eventId);
 						logger.info("Parameters: "
-								+ newMessage.getParametersUsed());
+								+ newMessage.getParametersUsed(false));
 					}
 
 					newMessage.sentMessage(ongoingJourney.getTraveller());
@@ -235,7 +235,7 @@ public class MessageHandler {
 								logger.info("Journey ID: "
 										+ ongoingJourney.getID());
 								logger.info("Parameters: "
-										+ newMessage.getParametersUsed());
+										+ newMessage.getParametersUsed(false));
 							}
 
 							newMessage.sentMessage(ongoingJourney
@@ -381,7 +381,7 @@ public class MessageHandler {
 							logger.info("Message: " + newMessage.getMessage());
 							logger.info("Journey ID: " + ongoingJourney.getID());
 							logger.info("Parameters: "
-									+ newMessage.getParametersUsed());
+									+ newMessage.getParametersUsed(false));
 						}
 
 						newMessage.sentMessage(ongoingJourney.getTraveller());
@@ -417,9 +417,9 @@ public class MessageHandler {
 					.getMessageJourneyID();
 
 			if (newMessage.equals(sentMessage)
-					&& (!((newMsgObject.getParametersUsed().equals(sentMessages
-							.get(i).getParametersUsed())) && (!sentMessages
-							.get(i).getParametersUsed().isEmpty())))) {
+					&& (!((newMsgObject.getParametersUsed(true).equals(sentMessages
+							.get(i).getParametersUsed(true))) && (!sentMessages
+							.get(i).getParametersUsed(true).isEmpty())))) {
 
 				long diff = newMessageTime - sentMessageTime;
 				long diffMinutes = diff / (60 * 1000) % 60;
@@ -438,9 +438,9 @@ public class MessageHandler {
 				}
 			}
 
-			else if ((newMsgObject.getParametersUsed().equals(sentMessages.get(
-					i).getParametersUsed()))
-					&& (!sentMessages.get(i).getParametersUsed().isEmpty())) {
+			else if ((newMsgObject.getParametersUsed(true).equals(sentMessages.get(
+					i).getParametersUsed(true)))
+					&& (!sentMessages.get(i).getParametersUsed(true).isEmpty())) {
 				if (newMessageJourneyID.equals(sentMessageJourneyID)) {
 					decision = false;
 				}

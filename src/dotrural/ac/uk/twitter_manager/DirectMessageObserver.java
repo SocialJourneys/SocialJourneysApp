@@ -149,8 +149,9 @@ public class DirectMessageObserver extends Thread {
 			 * Cap on 1 request per minute
 			 * https://dev.twitter.com/rest/reference/get/direct_messages
 			 */
-			System.out.println("request for direct message sent at " + new Date());
+			
 			lastDirectMessagesResult = twitter.getDirectMessages(pg);
+			System.out.println("request for direct message sent at " + new Date() + " received " + lastDirectMessagesResult.size());
 			// System.out.println("Direct messages " + directMessage);
 			// System.out.println("Direct messages retrieved" +
 			// lastDirectMessagesResult.size());
@@ -201,14 +202,12 @@ public class DirectMessageObserver extends Thread {
 			// conntact fuseki
 			DatasetAccessor da = DatasetAccessorFactory.createHTTP(PredefinedConstants.FUSEKI_URI);
 			boolean answer = da.getModel().containsResource(r);
-
 			// System.out.println(answer);
 			if (answer) {
 				System.out.println(temp.get(i).getId() + " - Already in the model !");
 			}
 
 			else {
-
 				logger.info(
 						" \n Requesting annotations for direct message : http://sj.abdn.ac.uk/ozStudyD2R/resource/ozstudy/twitter/directMessage/"
 								+ temp.get(i).getId());
@@ -224,8 +223,6 @@ public class DirectMessageObserver extends Thread {
 				String response = sendPostRequest(PredefinedConstants.ANNOTATION_DIRECT_MESSAGE_SERVICE_URL, rawData);
 
 				// request annotate
-				// System.out.println(response);
-
 				if (response != null) {
 					/*
 					 * store.startWritingSession("direct message");
@@ -238,23 +235,24 @@ public class DirectMessageObserver extends Thread {
 
 					Model m = ModelFactory.createDefaultModel().read(new ByteArrayInputStream(response.getBytes()),
 							null);
-
 					Resource eventType = ResourceFactory.createResource("http://purl.org/NET/c4dm/event.owl#Event");
 
 					boolean eventAnnotationsPresent = da.getModel().contains(null, RDF.type, eventType);
 
 					if (eventAnnotationsPresent) {
-
+						logger.info("Annotations present");
 						Property serviceProperty = ResourceFactory
 								.createProperty("http://vocab.org/transit/terms/service");
 
 						boolean inferenecesBetweenBusServicesAndEventsExist = da.getModel().contains(null,
 								serviceProperty);
+						m.write(System.out);
 
-						if (inferenecesBetweenBusServicesAndEventsExist) {
+//						if (inferenecesBetweenBusServicesAndEventsExist) {
 							// add to fuseki store
 							da.add(m);
-						}
+							logger.info("Added event to Fuseki");
+//						}
 
 					}
 
@@ -288,6 +286,7 @@ public class DirectMessageObserver extends Thread {
 		con.setRequestProperty("User-Agent", USER_AGENT);
 		con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
+		System.out.println("sending request to " + url);
 		// Send post request
 		con.setDoOutput(true);
 		DataOutputStream wr = new DataOutputStream(con.getOutputStream());
@@ -296,7 +295,9 @@ public class DirectMessageObserver extends Thread {
 		wr.close();
 
 		int responseCode = con.getResponseCode();
-
+		System.out.println("response code " + responseCode);
+		
+		
 		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
 		String inputLine;
 		StringBuffer response = new StringBuffer();

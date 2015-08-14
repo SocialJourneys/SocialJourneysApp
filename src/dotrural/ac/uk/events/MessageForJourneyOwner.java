@@ -10,70 +10,77 @@ import twitter4j.TwitterFactory;
 public class MessageForJourneyOwner {
 
 	String message = "Default message";
-	
+
 	long timeStamp;
-	
+
 	String journeyID;
-	
-	HashMap parameters ;
-	
-	public MessageForJourneyOwner () {
-		
-		/// handle generation of the message using NLG 
+
+	HashMap parameters;
+
+	public MessageForJourneyOwner() {
+
+		// / handle generation of the message using NLG
 		parameters = new HashMap();
 	}
-	
-public void setParametersUsed (HashMap parameters) {
-		
+
+	public void setParametersUsed(HashMap parameters) {
+
 		this.parameters = parameters;
 	}
-	
 
-public HashMap getParametersUsed () {
-	
-	return parameters;
-}
+	public HashMap getParametersUsed(boolean removeReportTime) {
+		HashMap map = (HashMap) parameters.clone();
+		System.out.println("Param map " + parameters.toString());
+		if (removeReportTime) {
+			map.remove("reportTime");
+			System.out.println("Returning map " + map.toString());
+		}
+		return map;
+	}
 
-	
-	public void setMessage (String message) {
-		
+	public void setMessage(String message) {
+
 		this.message = message;
 	}
-	
-public String getMessage () {
-		
+
+	public String getMessage() {
+
 		return message;
 	}
-	
-	public void sentMessage (String userScreenName) {
-		 Twitter twitter = new TwitterFactory().getInstance();
-	        try {
-	            DirectMessage directMessage = twitter.sendDirectMessage(userScreenName, message);
-	            System.out.println("Direct message successfully sent to " + directMessage.getRecipientScreenName());
-	        } catch (TwitterException te) {
-	            te.printStackTrace();
-	            System.out.println("Failed to send a direct message: " + te.getMessage());
-	            
-	        }
+
+	public void sentMessage(String userScreenName) {
+		Twitter twitter = new TwitterFactory().getInstance();
+		try {
+			System.out.println("sending " + message + " to " + userScreenName);
+			DirectMessage directMessage = twitter.sendDirectMessage(
+					userScreenName, message);
+			System.out.println("Direct message successfully sent to "
+					+ directMessage.getRecipientScreenName());
+		} catch (TwitterException te) {
+			te.printStackTrace();
+			System.out.println("Failed to send a direct message: "
+					+ te.getMessage());
+
+		}
 	}
-	
-	public void setMessageTime (long timeStamp) {
-		
+
+	public void setMessageTime(long timeStamp) {
+
 		this.timeStamp = timeStamp;
 	}
 
-	public void setMessageJourneyID (String journeyID) {
-	
+	public void setMessageJourneyID(String journeyID) {
+
 		this.journeyID = journeyID;
 	}
-	
-	public String getMessageJourneyID () {
-	
+
+	public String getMessageJourneyID() {
+
 		return journeyID;
 	}
 
-	public long getMessageTime () {
-	
+	public long getMessageTime() {
+
 		return timeStamp;
 	}
 
