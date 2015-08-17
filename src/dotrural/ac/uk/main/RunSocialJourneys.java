@@ -1,28 +1,14 @@
 package dotrural.ac.uk.main;
 
-import java.io.IOException;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-import org.apache.http.client.ClientProtocolException;
 import org.apache.log4j.Logger;
 
-import twitter4j.DirectMessage;
-import twitter4j.Paging;
-import twitter4j.Twitter;
-import twitter4j.TwitterException;
-import twitter4j.TwitterFactory;
 import dotrural.ac.uk.constants.PredefinedConstants;
 import dotrural.ac.uk.events.EventsObserver;
-import dotrural.ac.uk.events.MessageForJourneyOwner;
 import dotrural.ac.uk.journeys.JourneyObserver;
-import dotrural.ac.uk.realTime.NextBusAdaptor;
-import dotrural.ac.uk.store.JenaStore;
 import dotrural.ac.uk.twitter_manager.DirectMessageObserver;
 import dotrural.ac.uk.twitter_manager.TweetObserver;
-import dotrural.ac.uk.utils.DbConnect;
-import dotrural.ac.uk.utils.HttpRequests;
 
 public class RunSocialJourneys {
 
@@ -59,14 +45,17 @@ public class RunSocialJourneys {
 		}
 		 //start observing new tweets in the database and trigger annotation generation
          Thread tweetObserver = new TweetObserver ();
+
          tweetObserver.start();
-		 
+
 	
 		if(logger.isInfoEnabled()){
 			logger.info("Initiating the direct message observer. ");
 		} 
+
 		Thread directMsgObserver  = new DirectMessageObserver ();
 		directMsgObserver.start();
+
 	
 		if(logger.isInfoEnabled()){
 			logger.info("Initiating the events observer. ");
