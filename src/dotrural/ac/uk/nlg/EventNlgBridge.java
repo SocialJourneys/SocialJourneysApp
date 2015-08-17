@@ -53,6 +53,13 @@ public class EventNlgBridge {
 			+ "   ?e event:time/timeline:endsAtDateTime ?enddatetime.\n"
 			+ "}  \n" + "}";
 
+	private SimpleDateFormat format;
+
+	public EventNlgBridge() {
+		format = new SimpleDateFormat(
+				"yyyy-MM-dd'T'HH:mm:ss");
+	}
+
 	public Map<String, Map<String, Set<String>>> extractDetailsForNlg_Generic(
 			ResultSet results) {
 
@@ -96,8 +103,6 @@ public class EventNlgBridge {
 			else if ("Tweet"
 					.equals(typeValue)) {
 				String value = getValue(soln, "reportTime");
-				SimpleDateFormat format = new SimpleDateFormat(
-						"yyyy-MM-dd'T'HH:mm:ss");
 				Date d;
 				try {
 					d = format.parse(value);
