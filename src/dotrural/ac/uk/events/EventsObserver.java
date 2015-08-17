@@ -199,7 +199,8 @@ public class EventsObserver extends Thread {
 						+ "optional {?e <http://purl.org/td/transportdisruptionprops#primaryLocation>/rdfs:label ?primaryLocation.} "
 						+ "?e <http://www.w3.org/ns/prov#wasDerivedFrom> ?instance. "
 						+ "service <http://sj.abdn.ac.uk/ozStudyD2R/sparql> { "
-						+ "?instance  <http://www.dotrural.ac.uk/irp/uploads/ontologies/bottari#messageTimeStamp> ?reportTime.}"
+						+ "?instance  <http://www.dotrural.ac.uk/irp/uploads/ontologies/bottari#messageTimeStamp> ?reportTime. "
+						+ "?instance  a ?sourceType.}"
 						+ "}  \n";
 		ResultSet results = null;
 		try{
