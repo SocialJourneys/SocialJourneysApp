@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.jena.atlas.json.JSON;
+import org.apache.log4j.Logger;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.query.ResultSet;
@@ -16,7 +17,7 @@ import dotrural.ac.uk.utils.HttpRequests;
 
 public class NLG_Factory {
 	
-	
+	static private Logger logger = Logger.getLogger(NLG_Factory.class);
 
 	
 	
@@ -144,7 +145,7 @@ String data = "{";
 //		try {
 			//data = "{\"startsAtDateTime\":\"2015-05-27T17:45:38\",\"service\":\"Service 1\",\"primaryLocation\":\"Faulds Gate\",\"place\":\"Gardner Drive\",\"type\":\"PublicTransportDelay\",\"delayLength\":\"0 mins\"}";
 			//data = "{\"type\":\"PublicTransportDelay\",\"service\":\"service 1\",\"hasFactor\":\"road works\",\"primaryLocation\":\"st machar dr\",\"place\":\"road 1, road2\",\"delayLength\":\"0 mins\",\"startsAtDateTime\":\"2015-03-08T19:59:59\"}";
-			System.out.println("Event data to send to nlg: " + data);
+			logger.info("Event data to send to nlg: " + data);
 			msg = HttpRequests.sendPostRequest(PredefinedConstants.NLG_SERVICE_URI, data);
 			if ("".equals(msg))msg="error";
 //		} catch (IOException e) {
@@ -160,7 +161,7 @@ String data = "{";
 //		try {
 			//data = "{\"startsAtDateTime\":\"2015-05-27T17:45:38\",\"service\":\"Service 1\",\"primaryLocation\":\"Faulds Gate\",\"place\":\"Gardner Drive\",\"type\":\"PublicTransportDelay\",\"delayLength\":\"0 mins\"}";
 			//data = "{\"type\":\"PublicTransportDelay\",\"service\":\"service 1\",\"hasFactor\":\"road works\",\"primaryLocation\":\"st machar dr\",\"place\":\"road 1, road2\",\"delayLength\":\"0 mins\",\"startsAtDateTime\":\"2015-03-08T19:59:59\"}";
-			System.out.println("NLG generated messge data " + nlgData);
+			logger.info("NLG generated messge data " + nlgData);
 			msg = HttpRequests.sendPostRequest(PredefinedConstants.NLG_SERVICE_URI, nlgData);
 			if ("".equals(msg))msg="error";
 //		} catch (IOException e) {

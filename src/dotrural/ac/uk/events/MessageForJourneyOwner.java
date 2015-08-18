@@ -2,6 +2,8 @@ package dotrural.ac.uk.events;
 
 import java.util.HashMap;
 
+import org.apache.log4j.Logger;
+
 import twitter4j.DirectMessage;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
@@ -16,6 +18,8 @@ public class MessageForJourneyOwner {
 	String journeyID;
 
 	HashMap parameters;
+	
+	private static Logger logger = Logger.getLogger(MessageForJourneyOwner.class);
 
 	public MessageForJourneyOwner() {
 
@@ -51,14 +55,15 @@ public class MessageForJourneyOwner {
 	public void sentMessage(String userScreenName) {
 		Twitter twitter = new TwitterFactory().getInstance();
 		try {
-			System.out.println("sending " + message + " to " + userScreenName);
+			logger.info("sending " + message + " to " + userScreenName);
+			long t = System.currentTimeMillis();
 			DirectMessage directMessage = twitter.sendDirectMessage(
 					userScreenName, message);
-			System.out.println("Direct message successfully sent to "
+			logger.trace("send dm,"+(System.currentTimeMillis()-t)+","+userScreenName+","+message);
+			logger.info("Direct message successfully sent to "
 					+ directMessage.getRecipientScreenName());
 		} catch (TwitterException te) {
-			te.printStackTrace();
-			System.out.println("Failed to send a direct message: "
+			logger.error("Failed to send a direct message: "
 					+ te.getMessage());
 
 		}

@@ -14,10 +14,11 @@ import java.net.URLEncoder;
 import javax.net.ssl.HttpsURLConnection;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.log4j.Logger;
 
 public class HttpRequests {
 	private final static String USER_AGENT = "Mozilla/5.0";
-	
+	static private Logger log =Logger.getLogger(HttpRequests.class);
 	
 	public static void sendPostRequest (String rawData) throws IOException {
 		
@@ -71,8 +72,6 @@ public class HttpRequests {
 		con.setRequestProperty("User-Agent", USER_AGENT);
 		con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 		
-		
-		
  
 		// Send post request
 		con.setDoOutput(true);
@@ -100,7 +99,7 @@ public class HttpRequests {
 			res = response.toString();
 		}
 		} catch (IOException ioe){
-			System.err.println("Error with post request to " + url + " message " + ioe.getMessage());
+			log.error("Error with post request to " + url + " message " + ioe.getMessage());
 		}
 		return res.trim();
 	}
@@ -110,7 +109,7 @@ public static String sendAuthorisedPostRequest (String url, String data, String 
 		URL obj = new URL(url);
 		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 		
-		System.out.println(obj.toExternalForm());
+//		System.out.println(obj.toExternalForm());
 		//add reuqest header
 		con.setRequestMethod("POST");
 		con.setRequestProperty("User-Agent", USER_AGENT);
