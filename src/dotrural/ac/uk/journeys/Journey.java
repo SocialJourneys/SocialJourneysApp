@@ -36,6 +36,7 @@ public class Journey {
 	}
 
 	public void setStartMinutes(int startMinutes) {
+		System.out.println("setting start minutes " + startMinutes);
 		this.startMinutes = startMinutes;
 		
 	}

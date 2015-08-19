@@ -50,7 +50,7 @@ public class JourneyObserver extends Thread {
          
          try {
         	//databaseConnection = DriverManager.getConnection(url, user, password);
-			
+			System.out.println("Checking for journeys");
         	DbConnect connectionObject = new DbConnect();
         	pst = connectionObject.getDbConnect().prepareStatement("Select participant.twitter_handle,journey.id,journey.name,journey.bus_stop_code, journey.origin_master, journey.destination_master, journey.days_travelling,journey.alert_time, journey.time_of_departure, journey.time_of_arrival, journey.stages from participant inner join journey on journey.id = ANY (participant.journeys) where  ('"+getCurrentDay ()+"' = any(journey.days_travelling) AND (journey.status = 'TRUE')) Order by journey.time_of_departure asc;");
 			rs = pst.executeQuery();
@@ -58,8 +58,10 @@ public class JourneyObserver extends Thread {
 			connectionObject.closeDbConnect();
 			
 			while (rs.next()) {
+				System.out.println("foudnd one");
 				Journey newJourney = new Journey ();
 				newJourney.setID (rs.getString("id"));
+				System.out.println(newJourney.getID());
 				if (rs.getString("bus_stop_code")!=null) {
 				newJourney.setBusStopCode (rs.getString("bus_stop_code"));
 				}
@@ -117,6 +119,8 @@ public class JourneyObserver extends Thread {
 				
 				
 				tempSortedJourneys = sortJourney (newJourney,tempSortedJourneys);
+				
+				System.out.println(tempSortedJourneys.get("ongoing").size());
 				
 			//	System.out.println (rs.getString("twitter_handle") + " " +getCurrentMinutes() + " " + newJourney.getStartMinutes() +" "+ newJourney.getEndsMinutes() +" " +newJourney.getDelay()+" " +newJourney.getBusRoutes().get(0));
 				
@@ -231,6 +235,7 @@ public class JourneyObserver extends Thread {
 		int hours = time/100;
 		int minutes = time% 100; 
 		resultMinutes = (hours*60) + minutes;
+		System.out.println("Parsing " + time + " to " + resultMinutes);
 
 		return resultMinutes; 
 	}

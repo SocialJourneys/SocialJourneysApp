@@ -51,7 +51,7 @@ public class EventsObserver extends Thread {
 		ArrayList lessThan5MinsPrejourney = new ArrayList();
 
 		if (logger.isInfoEnabled()) {
-			logger.info("Starting events observer thread. ");
+			logger.info("Starting events observer thread.");
 		}
 
 		while (true) {
@@ -62,6 +62,8 @@ public class EventsObserver extends Thread {
 			ArrayList<Journey> ongoingJourneys = (ArrayList<Journey>) ((ArrayList<Journey>) journeyObs
 					.getSortedJourneys().get("ongoing")).clone();
 
+			logger.info("ongoing journeys " + ongoingJourneys.size());
+			
 			// System.out.println("Active Journeys " +ongoingJourneys.size());
 
 			// see if journey is in pre-journeystage and send relevant messages
@@ -75,7 +77,7 @@ public class EventsObserver extends Thread {
 						+ ongoingJourneys.get(i).getTraveller() + " current mins are " + currentMinutes + " journey mins are " + journey.getStartMinutes()
 						+ "more than 5 min array" +moreThan5MinsPrejourney + "less than 5 min array" + lessThan5MinsPrejourney + "\n");
 */
-				
+				System.out.println(journey.getStartMinutes() + " " + currentMinutes);
 				if ((journey.getStartMinutes() > currentMinutes)
 						&& (!(moreThan5MinsPrejourney.contains(journey.getID())))) {
 		/*			System.out
