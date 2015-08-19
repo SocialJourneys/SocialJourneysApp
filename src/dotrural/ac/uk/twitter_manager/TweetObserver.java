@@ -120,8 +120,11 @@ public class TweetObserver extends Thread {
 									+ temp.get(i) + "&sparqEndpoint="
 									+ PredefinedConstants.REPOSITORY_SPARQL_ENDPOINT_URL + "&includeInference=on";
 							// System.out.println(HttpRequests.sendPostRequest(rawData));
+							long t = System.currentTimeMillis();
 							String response = sendPostRequest(PredefinedConstants.ANNOTATION_TWEET_SERVICE_URL,
 									rawData);
+							logger.trace("request annotations for Tweet,"+(System.currentTimeMillis()-t)+","+temp.get(i)+",");
+							
 							// request annotate
 							// System.out.println(response);
 
@@ -150,7 +153,10 @@ public class TweetObserver extends Thread {
 
 									if (inferenecesBetweenBusServicesAndEventsExist) {
 										// add to fuseki store
+										t = System.currentTimeMillis();
 										da.add(m);
+										logger.trace("storing event and annotation model for Tweet,"+(System.currentTimeMillis()-t)+","+temp.get(i)+",");
+										
 									}
 								}
 

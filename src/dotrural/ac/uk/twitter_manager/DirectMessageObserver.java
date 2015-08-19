@@ -105,6 +105,7 @@ public class DirectMessageObserver extends Thread {
 
 	private void pushNewMessagesToDatabase(DirectMessage msg) throws SQLException {
 
+		long t= System.currentTimeMillis();
 		DbConnect connectionObject = new DbConnect();
 
 		// Check if already in the database
@@ -133,10 +134,11 @@ public class DirectMessageObserver extends Thread {
 			// System.out.println("Direct message sent to the database");
 		}
 		pst.close();
+		logger.trace("store dm,"+(System.currentTimeMillis()-t)+","+msg.getId()+",");
 	}
 
 	private void getLatestDirectMessages() {
-
+		long t = System.currentTimeMillis();
 		Twitter twitter = new TwitterFactory().getInstance();
 		try {
 			Paging pg = new Paging();
@@ -151,7 +153,7 @@ public class DirectMessageObserver extends Thread {
 			 */
 			
 			lastDirectMessagesResult = twitter.getDirectMessages(pg);
-			System.out.println("request for direct message sent at " + new Date() + " received " + lastDirectMessagesResult.size());
+			logger.info("request for direct message sent at " + new Date() + " received " + lastDirectMessagesResult.size());
 			// System.out.println("Direct messages " + directMessage);
 			// System.out.println("Direct messages retrieved" +
 			// lastDirectMessagesResult.size());
@@ -164,8 +166,10 @@ public class DirectMessageObserver extends Thread {
 				// System.out.println("Direct messages " + message.getText());
 			}
 		} catch (TwitterException te) {
-			te.printStackTrace();
+			logger.error("Error getting DMs "+ te.getLocalizedMessage(), te);
 		}
+		logger.trace("get dms from twitter,"+(System.currentTimeMillis()-t)+", ,");
+
 	}
 
 	private ArrayList selectMessagesForAnnotation() throws IOException, SQLException {
@@ -219,9 +223,9 @@ public class DirectMessageObserver extends Thread {
 						+ temp.get(i).getId() + "&sparqEndpoint=" + PredefinedConstants.REPOSITORY_SPARQL_ENDPOINT_URL
 						+ "&includeInference=on";
 				// System.out.println(HttpRequests.sendPostRequest(rawData));
-
+				long t = System.currentTimeMillis();
 				String response = sendPostRequest(PredefinedConstants.ANNOTATION_DIRECT_MESSAGE_SERVICE_URL, rawData);
-
+				logger.trace("request annotations for DM,"+(System.currentTimeMillis()-t)+","+lastDirectMessagesResult.get(i).getId()+",");
 				// request annotate
 				if (response != null) {
 					/*
@@ -250,8 +254,11 @@ public class DirectMessageObserver extends Thread {
 
 //						if (inferenecesBetweenBusServicesAndEventsExist) {
 							// add to fuseki store
+						
+							t = System.currentTimeMillis();
 							da.add(m);
-							logger.info("Added event to Fuseki");
+							logger.trace("storing event and annotation model for DM,"+(System.currentTimeMillis()-t)+","+lastDirectMessagesResult.get(i).getId()+",");
+							
 //						}
 
 					}
