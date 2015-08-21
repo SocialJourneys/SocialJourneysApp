@@ -65,7 +65,7 @@ public class EventsObserver extends Thread {
 					.getSortedJourneys().get("ongoing")).clone();
 
 			logger.info("ongoing journeys " + ongoingJourneys.size());
-			
+
 			// System.out.println("Active Journeys " +ongoingJourneys.size());
 
 			// see if journey is in pre-journeystage and send relevant messages
@@ -74,13 +74,17 @@ public class EventsObserver extends Thread {
 				Journey journey = ongoingJourneys.get(i);
 				int currentMinutes = getCurrentMinutes();
 
-
-			/*	System.out.println("looking into pre-journey stage of journey "
-						+ ongoingJourneys.get(i).getID() + " owned by "
-						+ ongoingJourneys.get(i).getTraveller() + " current mins are " + currentMinutes + " journey mins are " + journey.getStartMinutes()
-						+ "more than 5 min array" +moreThan5MinsPrejourney + "less than 5 min array" + lessThan5MinsPrejourney + "\n");
-*/
-				System.out.println(journey.getStartMinutes() + " " + currentMinutes);
+				/*
+				 * System.out.println("looking into pre-journey stage of journey "
+				 * + ongoingJourneys.get(i).getID() + " owned by " +
+				 * ongoingJourneys.get(i).getTraveller() + " current mins are "
+				 * + currentMinutes + " journey mins are " +
+				 * journey.getStartMinutes() + "more than 5 min array"
+				 * +moreThan5MinsPrejourney + "less than 5 min array" +
+				 * lessThan5MinsPrejourney + "\n");
+				 */
+				System.out.println(journey.getStartMinutes() + " "
+						+ currentMinutes);
 
 				if ((journey.getStartMinutes() > currentMinutes)
 						&& (!(moreThan5MinsPrejourney.contains(journey.getID())))) {
@@ -93,16 +97,23 @@ public class EventsObserver extends Thread {
 					if ((journey.getStartMinutes() - currentMinutes) > 5) {
 						try {
 							long t = System.currentTimeMillis();
-							MessageHandler.handlePrejourneyMessageMoreThan5MinutesBeforeTheJourney(sentMessages,
-									ongoingJourneys.get(i));
-							logger.trace("send >5 msg,"+(System.currentTimeMillis()-t)+","+journey.getID()+",");
+							MessageHandler
+									.handlePrejourneyMessageMoreThan5MinutesBeforeTheJourney(
+											sentMessages,
+											ongoingJourneys.get(i));
+							logger.trace("send >5 msg,"
+									+ (System.currentTimeMillis() - t) + ","
+									+ journey.getID() + ",");
 							moreThan5MinsPrejourney.add(journey.getID());
 						} catch (ClientProtocolException e) {
-							logger.debug("Exception sending >5 msg " + e.getLocalizedMessage());
+							logger.debug("Exception sending >5 msg "
+									+ e.getLocalizedMessage());
 						} catch (IOException e) {
-							logger.debug("Exception sending >5 msg " + e.getLocalizedMessage());
+							logger.debug("Exception sending >5 msg "
+									+ e.getLocalizedMessage());
 						} catch (IllegalArgumentException e) {
-							logger.debug("Parsing exception sending >5 msg related to NextBus API " + e.getLocalizedMessage());
+							logger.debug("Parsing exception sending >5 msg related to NextBus API "
+									+ e.getLocalizedMessage());
 						}
 					}
 				} else if (((journey.getStartMinutes() - currentMinutes) <= 5)
@@ -114,16 +125,22 @@ public class EventsObserver extends Thread {
 					// message");
 					try {
 						long t = System.currentTimeMillis();
-						MessageHandler.handlePrejourneyMessage5MinutesBeforeTheJourney(sentMessages,
-								ongoingJourneys.get(i));
-						logger.trace("send 5 msg,"+(System.currentTimeMillis()-t)+","+journey.getID()+",");
+						MessageHandler
+								.handlePrejourneyMessage5MinutesBeforeTheJourney(
+										sentMessages, ongoingJourneys.get(i));
+						logger.trace("send 5 msg,"
+								+ (System.currentTimeMillis() - t) + ","
+								+ journey.getID() + ",");
 						lessThan5MinsPrejourney.add(journey.getID());
 					} catch (ClientProtocolException e) {
-						logger.debug("Exception sending >5 msg " + e.getLocalizedMessage());
+						logger.debug("Exception sending >5 msg "
+								+ e.getLocalizedMessage());
 					} catch (IOException e) {
-						logger.debug("Exception sending >5 msg " + e.getLocalizedMessage());
+						logger.debug("Exception sending >5 msg "
+								+ e.getLocalizedMessage());
 					} catch (IllegalArgumentException e) {
-						logger.debug("Parsing exception sending >5 msg related to NextBus API " + e.getLocalizedMessage());
+						logger.debug("Parsing exception sending >5 msg related to NextBus API "
+								+ e.getLocalizedMessage());
 					}
 
 				} else if ((journey.getStartMinutes() - currentMinutes) <= 0) {
@@ -140,9 +157,12 @@ public class EventsObserver extends Thread {
 				// +ongoingJourneys.get(i).getTraveller());
 				HashMap result = checkJourneyForEvents(ongoingJourneys.get(i));
 				long t = System.currentTimeMillis();
-				MessageHandler.handleDisruptionEventMessage(result, sentMessages, ongoingJourneys.get(i));
-				logger.trace("sent disruption msg,"+(System.currentTimeMillis()-t)+","+ongoingJourneys.get(i).getID()+",");
-				
+				MessageHandler.handleDisruptionEventMessage(result,
+						sentMessages, ongoingJourneys.get(i));
+				logger.trace("sent disruption msg,"
+						+ (System.currentTimeMillis() - t) + ","
+						+ ongoingJourneys.get(i).getID() + ",");
+
 			}
 
 			try {
@@ -189,13 +209,20 @@ public class EventsObserver extends Thread {
 				+ "PREFIX event: <http://purl.org/NET/c4dm/event.owl#>\n"
 				+ "PREFIX timeline: <http://purl.org/NET/c4dm/timeline.owl#>\n"
 				+ "PREFIX transit: <http://vocab.org/transit/terms/>\n"
-				+ "PREFIX td: <http://purl.org/td/transportdisruption#>\n" + "SELECT *\n" + "WHERE {\n"
+				+ "PREFIX td: <http://purl.org/td/transportdisruption#>\n"
+				+ "SELECT *\n"
+				+ "WHERE {\n"
 				+ " ?e a ?eventType. ?e rdfs:label ?elabel."
 				+ "?e <http://vocab.org/transit/terms/service> <http://sj.abdn.ac.uk/resource/basemap/busLines/ABDN_"
-				+ serviceName + ">. " + "?eventType rdfs:subClassOf event:Event.\n"
-				+ "   ?e event:time/timeline:beginsAtDateTime ?startdatetime.\n" + "bind (now() as ?now)"
-				+ "filter (?now >= ?startdatetime)" + "   ?e event:time/timeline:endsAtDateTime ?enddatetime.\n"
-				+ "filter (?now <= ?enddatetime)" + ""
+				+ serviceName
+				+ ">. "
+				+ "?eventType rdfs:subClassOf event:Event.\n"
+				+ "   ?e event:time/timeline:beginsAtDateTime ?startdatetime.\n"
+				+ "bind (now() as ?now)"
+				+ "filter (?now >= ?startdatetime)"
+				+ "   ?e event:time/timeline:endsAtDateTime ?enddatetime.\n"
+				+ "filter (?now <= ?enddatetime)"
+				+ ""
 				+ "optional {?e <http://purl.org/td/transportdisruptionprops/delayLength>/rdfs:label ?delayLength.} "
 				+ "optional {?e <http://purl.org/td/transportdisruptionprops#primaryLocation>/rdfs:label ?primaryLocation.} "
 				+ "?e <http://www.w3.org/ns/prov#wasDerivedFrom> ?instance. "
@@ -204,21 +231,29 @@ public class EventsObserver extends Thread {
 				+ "?instance  a ?sourceType.}" + "}  \n";
 		ResultSet results = null;
 		try {
-			long t = System.currentTimeMillis();
-			long t1 = t;
-			DatasetAccessor da = DatasetAccessorFactory.createHTTP(PredefinedConstants.FUSEKI_URI);
-			logger.trace("Init event dataset,"+(System.currentTimeMillis()-t1)+","+t+",service " + serviceName);
+			long t1 = System.currentTimeMillis();
+			DatasetAccessor da = DatasetAccessorFactory
+					.createHTTP(PredefinedConstants.FUSEKI_URI);
+			logger.trace("Init event dataset,"
+					+ (System.currentTimeMillis() - t1) + ",service "
+					+ serviceName);
 			t1 = System.currentTimeMillis();
-			
-			queryExecution = QueryExecutionFactory.create(queryString, da.getModel());
-			logger.trace("Init event query exec,"+(System.currentTimeMillis()-t1)+","+t+",service " + serviceName);
-			
+
+			queryExecution = QueryExecutionFactory.create(queryString,
+					da.getModel());
+			logger.trace("Init event query exec,"
+					+ (System.currentTimeMillis() - t1) + ",service "
+					+ serviceName);
+
 			t1 = System.currentTimeMillis();
 			results = queryExecution.execSelect();
-			logger.trace("Perform event query,"+(System.currentTimeMillis()-t1)+","+t+",service " + serviceName);
-			
+			logger.trace("Perform event query,"
+					+ (System.currentTimeMillis() - t1) + ",service "
+					+ serviceName);
+
 		} catch (HttpException except) {
-			logger.error("Unable to connect to event fuseki - " + except.getMessage());
+			logger.error("Unable to connect to event fuseki - "
+					+ except.getMessage());
 		}
 
 		return results;
@@ -230,7 +265,8 @@ public class EventsObserver extends Thread {
 		ArrayList journeyBusRoutes = journey.getBusRoutes();
 		for (int j = 0; j < journeyBusRoutes.size(); j++) {
 
-			ResultSet temp = getEventsForService((String) journeyBusRoutes.get(j));
+			ResultSet temp = getEventsForService((String) journeyBusRoutes
+					.get(j));
 
 			NLG_Factory generatedResponses = new NLG_Factory();
 
@@ -265,7 +301,8 @@ public class EventsObserver extends Thread {
 
 		Calendar calendar = GregorianCalendar.getInstance();
 
-		currentMinutes = calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE);
+		currentMinutes = calendar.get(Calendar.HOUR_OF_DAY) * 60
+				+ calendar.get(Calendar.MINUTE);
 
 		return currentMinutes;
 	}

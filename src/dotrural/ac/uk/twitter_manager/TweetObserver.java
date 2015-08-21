@@ -111,7 +111,7 @@ public class TweetObserver extends Thread {
 
 							if (logger.isInfoEnabled()) {
 								logger.info(
-										" \n Requesting annotations for tweet : http://sj.abdn.ac.uk/ozStudyD2R/resource/ozstudy/twitter/tweet/"
+										"Requesting annotations for tweet : http://sj.abdn.ac.uk/ozStudyD2R/resource/ozstudy/twitter/tweet/"
 												+ temp.get(i));
 
 							}
@@ -155,7 +155,7 @@ public class TweetObserver extends Thread {
 										// add to fuseki store
 										t = System.currentTimeMillis();
 										da.add(m);
-										logger.trace("storing event and annotation model for Tweet,"+(System.currentTimeMillis()-t)+","+temp.get(i)+",");
+										logger.trace("stored event and annotation model for Tweet,"+(System.currentTimeMillis()-t)+","+temp.get(i)+",");
 										
 									}
 								}

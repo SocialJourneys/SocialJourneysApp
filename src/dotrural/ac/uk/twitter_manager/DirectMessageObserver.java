@@ -103,28 +103,32 @@ public class DirectMessageObserver extends Thread {
 		}
 	}
 
-	private void pushNewMessagesToDatabase(DirectMessage msg) throws SQLException {
+	private void pushNewMessagesToDatabase(DirectMessage msg)
+			throws SQLException {
 
-		long t= System.currentTimeMillis();
+		long t = System.currentTimeMillis();
 		DbConnect connectionObject = new DbConnect();
 
 		// Check if already in the database
-		pst = connectionObject.getDbConnect()
-				.prepareStatement("SELECT msg_id from direct_messages WHERE msg_id = " + msg.getId() + ";");
+		pst = connectionObject.getDbConnect().prepareStatement(
+				"SELECT msg_id from direct_messages WHERE msg_id = "
+						+ msg.getId() + ";");
 
 		rs = pst.executeQuery();
 
 		if (!rs.next()) {
 
-			pst = connectionObject.getDbConnect().prepareStatement(
-					"INSERT INTO direct_messages (msg_id,recipient_screen_name,text,created_at,sender_screen_name) VALUES (?,?,?,?,?);");
+			pst = connectionObject
+					.getDbConnect()
+					.prepareStatement(
+							"INSERT INTO direct_messages (msg_id,recipient_screen_name,text,created_at,sender_screen_name) VALUES (?,?,?,?,?);");
 
 			pst.setLong(1, msg.getId());
 			pst.setString(2, msg.getRecipientScreenName());
 			pst.setString(3, msg.getText());
 
 			long time = (msg.getCreatedAt()).getTime();
-			pst.setTimestamp(4, new Timestamp( time));
+			pst.setTimestamp(4, new Timestamp(time));
 
 			pst.setString(5, msg.getSenderScreenName());
 
@@ -134,7 +138,8 @@ public class DirectMessageObserver extends Thread {
 			// System.out.println("Direct message sent to the database");
 		}
 		pst.close();
-		logger.trace("store dm,"+(System.currentTimeMillis()-t)+","+msg.getId()+",");
+		logger.trace("store dm," + (System.currentTimeMillis() - t) + ","
+				+ msg.getId() + ",");
 	}
 
 	private void getLatestDirectMessages() {
@@ -142,18 +147,20 @@ public class DirectMessageObserver extends Thread {
 		Twitter twitter = new TwitterFactory().getInstance();
 		try {
 			Paging pg = new Paging();
-			pg.setCount(5);
+			pg.setCount(50);
 			// id of the last direct message from the previous study
-			long lng = Long.parseLong(PredefinedConstants.OLDEST_DIRECT_MESSAGE_ID_TO_LOOK_UP);
+			long lng = Long
+					.parseLong(PredefinedConstants.OLDEST_DIRECT_MESSAGE_ID_TO_LOOK_UP);
 			pg.setSinceId(lng);
 
 			/*
 			 * Cap on 1 request per minute
 			 * https://dev.twitter.com/rest/reference/get/direct_messages
 			 */
-			
+
 			lastDirectMessagesResult = twitter.getDirectMessages(pg);
-			logger.info("request for direct message sent at " + new Date() + " received " + lastDirectMessagesResult.size());
+			logger.info("request for direct message sent at " + new Date()
+					+ " received " + lastDirectMessagesResult.size());
 			// System.out.println("Direct messages " + directMessage);
 			// System.out.println("Direct messages retrieved" +
 			// lastDirectMessagesResult.size());
@@ -166,17 +173,20 @@ public class DirectMessageObserver extends Thread {
 				// System.out.println("Direct messages " + message.getText());
 			}
 		} catch (TwitterException te) {
-			logger.error("Error getting DMs "+ te.getLocalizedMessage(), te);
+			logger.error("Error getting DMs " + te.getLocalizedMessage(), te);
 		}
-		logger.trace("get dms from twitter,"+(System.currentTimeMillis()-t)+", ,");
+		logger.trace("get dms from twitter," + (System.currentTimeMillis() - t)
+				+ "," + lastDirectMessagesResult.size() + ",");
 
 	}
 
-	private ArrayList selectMessagesForAnnotation() throws IOException, SQLException {
+	private ArrayList selectMessagesForAnnotation() throws IOException,
+			SQLException {
 		ArrayList arrayTweetsForAnnotation = new ArrayList();
 
 		for (int i = 0; i < lastDirectMessagesResult.size(); i++) {
-			if (!previousDirectMessagesResult.contains(lastDirectMessagesResult.get(i))) {
+			if (!previousDirectMessagesResult.contains(lastDirectMessagesResult
+					.get(i))) {
 				arrayTweetsForAnnotation.add(lastDirectMessagesResult.get(i));
 			}
 
@@ -191,8 +201,9 @@ public class DirectMessageObserver extends Thread {
 		for (int i = 0; i < temp.size(); i++) {
 
 			// System.out.println (temp.get(i).getId());
-			Resource r = ResourceFactory.createResource(
-					"http://sj.abdn.ac.uk/ozStudyD2R/resource/ozstudy/twitter/directMessage/" + temp.get(i).getId());
+			Resource r = ResourceFactory
+					.createResource("http://sj.abdn.ac.uk/ozStudyD2R/resource/ozstudy/twitter/directMessage/"
+							+ temp.get(i).getId());
 
 			// System.out.println("New direct message ID!" +
 			// temp.get(i).getId());
@@ -204,28 +215,35 @@ public class DirectMessageObserver extends Thread {
 			 */
 
 			// conntact fuseki
-			DatasetAccessor da = DatasetAccessorFactory.createHTTP(PredefinedConstants.FUSEKI_URI);
+			DatasetAccessor da = DatasetAccessorFactory
+					.createHTTP(PredefinedConstants.FUSEKI_URI);
 			boolean answer = da.getModel().containsResource(r);
 			// System.out.println(answer);
 			if (answer) {
-				System.out.println(temp.get(i).getId() + " - Already in the model !");
+				System.out.println(temp.get(i).getId()
+						+ " - Already in the model !");
 			}
 
 			else {
-				logger.info(
-						" \n Requesting annotations for direct message : http://sj.abdn.ac.uk/ozStudyD2R/resource/ozstudy/twitter/directMessage/"
-								+ temp.get(i).getId());
+				logger.info("Requesting annotations for direct message : http://sj.abdn.ac.uk/ozStudyD2R/resource/ozstudy/twitter/directMessage/"
+						+ temp.get(i).getId());
 
 				pushNewMessagesToDatabase(lastDirectMessagesResult.get(i));
 
 				// test annotation service
 				String rawData = "uri=http://sj.abdn.ac.uk/ozStudyD2R/resource/ozstudy/twitter/directMessage/"
-						+ temp.get(i).getId() + "&sparqEndpoint=" + PredefinedConstants.REPOSITORY_SPARQL_ENDPOINT_URL
+						+ temp.get(i).getId()
+						+ "&sparqEndpoint="
+						+ PredefinedConstants.REPOSITORY_SPARQL_ENDPOINT_URL
 						+ "&includeInference=on";
 				// System.out.println(HttpRequests.sendPostRequest(rawData));
 				long t = System.currentTimeMillis();
-				String response = sendPostRequest(PredefinedConstants.ANNOTATION_DIRECT_MESSAGE_SERVICE_URL, rawData);
-				logger.trace("request annotations for DM,"+(System.currentTimeMillis()-t)+","+lastDirectMessagesResult.get(i).getId()+",");
+				String response = sendPostRequest(
+						PredefinedConstants.ANNOTATION_DIRECT_MESSAGE_SERVICE_URL,
+						rawData);
+				logger.trace("request annotations for DM,"
+						+ (System.currentTimeMillis() - t) + ","
+						+ lastDirectMessagesResult.get(i).getId() + ",");
 				// request annotate
 				if (response != null) {
 					/*
@@ -237,29 +255,36 @@ public class DirectMessageObserver extends Thread {
 					// DatasetAccessor da =
 					// DatasetAccessorFactory.createHTTP(PredefinedConstants.FUSEKI_URI);
 
-					Model m = ModelFactory.createDefaultModel().read(new ByteArrayInputStream(response.getBytes()),
-							null);
-					Resource eventType = ResourceFactory.createResource("http://purl.org/NET/c4dm/event.owl#Event");
+					Model m = ModelFactory
+							.createDefaultModel()
+							.read(new ByteArrayInputStream(response.getBytes()),
+									null);
+					Resource eventType = ResourceFactory
+							.createResource("http://purl.org/NET/c4dm/event.owl#Event");
 
-					boolean eventAnnotationsPresent = da.getModel().contains(null, RDF.type, eventType);
+					boolean eventAnnotationsPresent = da.getModel().contains(
+							null, RDF.type, eventType);
 
 					if (eventAnnotationsPresent) {
 						logger.info("Annotations present");
 						Property serviceProperty = ResourceFactory
 								.createProperty("http://vocab.org/transit/terms/service");
 
-						boolean inferenecesBetweenBusServicesAndEventsExist = da.getModel().contains(null,
-								serviceProperty);
+						boolean inferenecesBetweenBusServicesAndEventsExist = da
+								.getModel().contains(null, serviceProperty);
 						m.write(System.out);
 
-//						if (inferenecesBetweenBusServicesAndEventsExist) {
-							// add to fuseki store
-						
-							t = System.currentTimeMillis();
-							da.add(m);
-							logger.trace("storing event and annotation model for DM,"+(System.currentTimeMillis()-t)+","+lastDirectMessagesResult.get(i).getId()+",");
-							
-//						}
+						// if (inferenecesBetweenBusServicesAndEventsExist) {
+						// add to fuseki store
+
+						t = System.currentTimeMillis();
+						da.add(m);
+						logger.trace("storing event and annotation model for DM,"
+								+ (System.currentTimeMillis() - t)
+								+ ","
+								+ lastDirectMessagesResult.get(i).getId() + ",");
+
+						// }
 
 					}
 
@@ -269,9 +294,8 @@ public class DirectMessageObserver extends Thread {
 					// http://sj.abdn.ac.uk/ozStudyD2R/resource/ozstudy/twitter/direcMessage/"+temp.get(i));
 
 					if (logger.isInfoEnabled()) {
-						logger.info(
-								"Tweet annotation service probably not working. Check resource : http://sj.abdn.ac.uk/ozStudyD2R/resource/ozstudy/twitter/direcMessage/"
-										+ temp.get(i));
+						logger.info("Tweet annotation service probably not working. Check resource : http://sj.abdn.ac.uk/ozStudyD2R/resource/ozstudy/twitter/direcMessage/"
+								+ temp.get(i));
 
 					}
 
@@ -283,7 +307,8 @@ public class DirectMessageObserver extends Thread {
 
 	}
 
-	public String sendPostRequest(String url, String urlParameters) throws IOException {
+	public String sendPostRequest(String url, String urlParameters)
+			throws IOException {
 
 		URL obj = new URL(url);
 		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -303,9 +328,9 @@ public class DirectMessageObserver extends Thread {
 
 		int responseCode = con.getResponseCode();
 		System.out.println("response code " + responseCode);
-		
-		
-		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+
+		BufferedReader in = new BufferedReader(new InputStreamReader(
+				con.getInputStream()));
 		String inputLine;
 		StringBuffer response = new StringBuffer();
 

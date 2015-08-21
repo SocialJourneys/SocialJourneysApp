@@ -89,7 +89,7 @@ public class MessageHandler {
 								+ newMessage.getParametersUsed(false));
 					}
 
-					newMessage.sentMessage(ongoingJourney.getTraveller());
+					newMessage.sentMessage("EVENT", ongoingJourney.getID(), ongoingJourney.getTraveller());
 
 					((ArrayList) (((HashMap) sentMessages.get(ongoingJourney
 							.getTraveller()))).get("Messages")).add(newMessage);
@@ -240,7 +240,7 @@ public class MessageHandler {
 										+ newMessage.getParametersUsed(false));
 							}
 
-							newMessage.sentMessage(ongoingJourney
+							newMessage.sentMessage("RT EARLY", ongoingJourney.getID(), ongoingJourney
 									.getTraveller());
 
 							((ArrayList) (((HashMap) sentMessages
@@ -386,7 +386,7 @@ public class MessageHandler {
 									+ newMessage.getParametersUsed(false));
 						}
 
-						newMessage.sentMessage(ongoingJourney.getTraveller());
+						newMessage.sentMessage("RT 5", ongoingJourney.getID(), ongoingJourney.getTraveller());
 
 						((ArrayList) (((HashMap) sentMessages
 								.get(ongoingJourney.getTraveller())))
