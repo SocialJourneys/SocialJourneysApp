@@ -64,35 +64,42 @@ public class DirectMessageObserver extends Thread {
 	public void run() {
 		while (true) {
 			getLatestDirectMessages();
+			List<DirectMessage> toBeAnnotated = new ArrayList<DirectMessage>();
+			for (DirectMessage dm : lastDirectMessagesResult) {
+				if (!previousDirectMessagesResult.contains(dm)) {
+					previousDirectMessagesResult.add(dm);
+					toBeAnnotated.add(dm);
+				}
+			}
+			// if
+			// (!lastDirectMessagesResult.equals(previousDirectMessagesResult))
+			// {
+			System.out.println("New direct messages discovered!");
+			try {
 
-			if (!lastDirectMessagesResult.equals(previousDirectMessagesResult)) {
-				System.out.println("New direct messages discovered!");
 				try {
-
-					try {
-						requestAnnotations(selectMessagesForAnnotation());
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
-					/*
-					 * BufferedWriter bufferWritter = new BufferedWriter(new
-					 * FileWriter("./Store/sjStore.ttl"));
-					 * store.getStore().write (bufferWritter,"TTL");
-					 * bufferWritter.close();
-					 */
-
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (SQLException e) {
+					requestAnnotations(toBeAnnotated);// selectMessagesForAnnotation());
+				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-			}
 
-			previousDirectMessagesResult = lastDirectMessagesResult;
+				/*
+				 * BufferedWriter bufferWritter = new BufferedWriter(new
+				 * FileWriter("./Store/sjStore.ttl")); store.getStore().write
+				 * (bufferWritter,"TTL"); bufferWritter.close();
+				 */
+
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			// }
+
+			// previousDirectMessagesResult = lastDirectMessagesResult;
 
 			try {
 				TimeUnit.SECONDS.sleep(180);
@@ -195,7 +202,7 @@ public class DirectMessageObserver extends Thread {
 		return arrayTweetsForAnnotation;
 	}
 
-	private void requestAnnotations(ArrayList<DirectMessage> temp)
+	private void requestAnnotations(List<DirectMessage> temp)
 			throws IOException, SQLException, InterruptedException {
 
 		for (int i = 0; i < temp.size(); i++) {
@@ -300,6 +307,7 @@ public class DirectMessageObserver extends Thread {
 					}
 
 				}
+				TimeUnit.SECONDS.sleep(2);
 
 			}
 

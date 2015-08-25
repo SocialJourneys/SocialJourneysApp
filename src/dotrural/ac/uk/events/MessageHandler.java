@@ -27,12 +27,12 @@ public class MessageHandler {
 			HashMap sentMessages, Journey ongoingJourney) {
 
 		int count = 0;
-		for (Object s : result.keySet()){
+		for (Object s : result.keySet()) {
 			String service = s.toString();
 			System.out.println(service);
 			HashMap delaysReported = (HashMap) result.get(service);
 
-			for (Object eventObj : delaysReported.keySet()){
+			for (Object eventObj : delaysReported.keySet()) {
 
 				String eventId = eventObj.toString();
 
@@ -53,7 +53,7 @@ public class MessageHandler {
 				Set services = new HashSet();
 				services.add("service " + service);
 				parameters.put("service", services);
-				
+
 				MessageForJourneyOwner newMessage = new MessageForJourneyOwner();
 
 				newMessage.setParametersUsed(parameters);
@@ -89,7 +89,8 @@ public class MessageHandler {
 								+ newMessage.getParametersUsed(false));
 					}
 
-					newMessage.sentMessage("EVENT", ongoingJourney.getID(), ongoingJourney.getTraveller());
+					newMessage.sentMessage("EVENT", ongoingJourney.getID(),
+							ongoingJourney.getTraveller());
 
 					((ArrayList) (((HashMap) sentMessages.get(ongoingJourney
 							.getTraveller()))).get("Messages")).add(newMessage);
@@ -104,7 +105,7 @@ public class MessageHandler {
 			throws ClientProtocolException, IOException {
 
 		logger.info("handling pre 5 messages");
-		
+
 		if (!sentMessages.keySet().contains(ongoingJourney.getTraveller())) {
 			HashMap messages = new HashMap<String, String>();
 			sentMessages.put(ongoingJourney.getTraveller(), messages);
@@ -130,7 +131,7 @@ public class MessageHandler {
 					.getBusRoutes().get(i));
 			pars.runParsing();
 			ArrayList<String> times = pars.getParsingResult();
-			logger.info("Retrieved times for service "
+			logger.info("Retrieved >5 mins times for service "
 					+ ongoingJourney.getBusRoutes().get(i) + ": "
 					+ times.toString());
 
@@ -171,7 +172,8 @@ public class MessageHandler {
 				}
 
 				String msg;
-
+				logger.info("closestToJourneyStart " + closesToTheJourneyStart
+						+ " busTime is " + busTime);
 				// System.out.println("got times");
 				// System.out.println(closesToTheJourneyStart);
 				if (!closesToTheJourneyStart.equals("") && busTime != -1) {
@@ -240,8 +242,9 @@ public class MessageHandler {
 										+ newMessage.getParametersUsed(false));
 							}
 
-							newMessage.sentMessage("RT EARLY", ongoingJourney.getID(), ongoingJourney
-									.getTraveller());
+							newMessage.sentMessage("RT EARLY",
+									ongoingJourney.getID(),
+									ongoingJourney.getTraveller());
 
 							((ArrayList) (((HashMap) sentMessages
 									.get(ongoingJourney.getTraveller())))
@@ -286,6 +289,9 @@ public class MessageHandler {
 					.getBusRoutes().get(i));
 			pars.runParsing();
 			ArrayList<String> times = pars.getParsingResult();
+			logger.info("Retrieved 5min times for service "
+					+ ongoingJourney.getBusRoutes().get(i) + ": "
+					+ times.toString());
 			if (times.isEmpty()) {
 				logger.error("Error with response from NextBus API so not sending any real time message for journey "
 						+ ongoingJourney.getID()
@@ -386,7 +392,8 @@ public class MessageHandler {
 									+ newMessage.getParametersUsed(false));
 						}
 
-						newMessage.sentMessage("RT 5", ongoingJourney.getID(), ongoingJourney.getTraveller());
+						newMessage.sentMessage("RT 5", ongoingJourney.getID(),
+								ongoingJourney.getTraveller());
 
 						((ArrayList) (((HashMap) sentMessages
 								.get(ongoingJourney.getTraveller())))
@@ -419,8 +426,8 @@ public class MessageHandler {
 					.getMessageJourneyID();
 
 			if (newMessage.equals(sentMessage)
-					&& (!((newMsgObject.getParametersUsed(true).equals(sentMessages
-							.get(i).getParametersUsed(true))) && (!sentMessages
+					&& (!((newMsgObject.getParametersUsed(true)
+							.equals(sentMessages.get(i).getParametersUsed(true))) && (!sentMessages
 							.get(i).getParametersUsed(true).isEmpty())))) {
 
 				long diff = newMessageTime - sentMessageTime;
@@ -440,8 +447,8 @@ public class MessageHandler {
 				}
 			}
 
-			else if ((newMsgObject.getParametersUsed(true).equals(sentMessages.get(
-					i).getParametersUsed(true)))
+			else if ((newMsgObject.getParametersUsed(true).equals(sentMessages
+					.get(i).getParametersUsed(true)))
 					&& (!sentMessages.get(i).getParametersUsed(true).isEmpty())) {
 				if (newMessageJourneyID.equals(sentMessageJourneyID)) {
 					decision = false;
@@ -449,6 +456,8 @@ public class MessageHandler {
 			}
 
 		}
+		logger.info("Dispatch decision for \"" + newMsgObject.getMessage()
+				+ "\" journey " + newMsgObject.getMessageJourneyID() + " is " + decision);
 		return decision;
 	}
 
