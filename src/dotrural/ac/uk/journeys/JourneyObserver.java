@@ -142,7 +142,7 @@ public class JourneyObserver extends Thread {
 
 			sortedJourneys = tempSortedJourneys;
 
-			logger.trace("getting journeys,"+(System.currentTimeMillis()-t)+",");
+			logger.trace("getting journeys,"+(System.currentTimeMillis()-t)+"," + sortedJourneys.get("ongoing").size());
 			
 			try {
 				TimeUnit.SECONDS.sleep(60);

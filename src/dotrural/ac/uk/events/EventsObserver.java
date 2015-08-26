@@ -64,7 +64,8 @@ public class EventsObserver extends Thread {
 			ArrayList<Journey> ongoingJourneys = (ArrayList<Journey>) ((ArrayList<Journey>) journeyObs
 					.getSortedJourneys().get("ongoing")).clone();
 
-			logger.info("ongoing journeys " + ongoingJourneys.size());
+//			if (ongoingJourneys.size() > 0)
+//				logger.info("ongoing journeys " + ongoingJourneys.size());
 
 			// System.out.println("Active Journeys " +ongoingJourneys.size());
 

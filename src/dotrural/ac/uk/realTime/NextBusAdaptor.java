@@ -64,10 +64,12 @@ public class NextBusAdaptor {
 	}
 	
 	public static void main(String[] args) throws ClientProtocolException, IOException {
-		Parser pars = new Parser (new NextBusAdaptor().getLiveDepartures("23234548"),"2");
-		
-		
+				
+		String xml =		new NextBusAdaptor().getLiveDepartures("23232875");
+		System.out.println(xml);
+		Parser pars = new Parser(xml, "1");
 		pars.runParsing();
+		System.out.println(pars.getParsingResult());
 		
 	}
 }
