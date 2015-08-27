@@ -26,6 +26,7 @@ public class Parser extends DefaultHandler {
 	ArrayList<String> parsingResult;
 	String content = null;
 	boolean desiredService = false;
+	boolean aimedDepartureAdded =false;
 	static private Logger log = Logger.getLogger(Parser.class);
 
 	public Parser(String xml, String service) throws IOException {
@@ -84,15 +85,31 @@ public class Parser extends DefaultHandler {
 		if (qName == "PublishedLineName") {
 			if (content.equals(service)) {
 				desiredService = true;
+				aimedDepartureAdded = false;
 			} else {
 				desiredService = false;
 			}
 		}
 
-		if (qName == "ExpectedDepartureTime") {
+		if (qName == "AimedDepartureTime") {
 			if (desiredService) {
 				if (!content.equals("0"))
 					parsingResult.add(content);
+				aimedDepartureAdded = true;
+
+			}
+		}
+
+		if (qName == "ExpectedDepartureTime") {
+			if (desiredService) {
+				if (!content.equals("0")) {
+					if (aimedDepartureAdded) {
+						parsingResult.set(parsingResult.size() - 1, content);
+
+					} else {
+						parsingResult.add(content);
+					}
+				}
 
 			}
 		}
