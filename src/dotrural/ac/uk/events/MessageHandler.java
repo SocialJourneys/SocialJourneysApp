@@ -328,7 +328,7 @@ public class MessageHandler {
 			// System.out.println(times);
 
 			if (!times.isEmpty()) {
-
+                if (busTime !=-1) {
 				String msg;
 				NLG_Factory nlg = new NLG_Factory();
 
@@ -401,6 +401,13 @@ public class MessageHandler {
 					}
 
 				}
+				
+			}
+			else {
+				logger.error("Error parsing DateTime from NextBus API - value ("
+						+ times.get(0) + ") error: Must have been corrupted value");
+			}
+				
 			}
 
 		}
